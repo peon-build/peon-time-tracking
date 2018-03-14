@@ -1,0 +1,26 @@
+{
+  "name": "@peon-build/peon-time-tracking",
+  "version": "1.0.0",
+  "description": "Time tracking utils for peon build.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node peon-tt.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "peon",
+    "time",
+    "tracking",
+    "build"
+  ],
+  "author": "Stanislav Hacker",
+  "license": "ISC",
+  "dependencies": {
+    "@peon-build/peon-log": "*",
+    "chokidar": "^2.0.2",
+    "commander": "^2.15.0"
+  },
+  "bin": {
+    "peon-tt": "peon-tt.js"
+  }
+}
