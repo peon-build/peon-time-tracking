@@ -1,5 +1,5 @@
 @IF EXIST "%~dp0\node.exe" (
-  "%~dp0\node.exe"  "%~dp0\..\@peon-build\peon-time-tracking\bin\peon-tt" %*
+  "%~dp0\node.exe"  "%~dp0\..\@peon-build\peon-time-tracking\peon-tt" %*
 ) ELSE (
   @SETLOCAL
   @SET PATHEXT=%PATHEXT:;.JS;=;%
