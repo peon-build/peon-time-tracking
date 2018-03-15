@@ -97,6 +97,7 @@ program
 	.option('-ip, --ignore-pattern <pattern>', `Ignore watching glob pattern. See ${globWiki}. Current default is '${ignoreDefault}'.`)
 	.option('-l, --log-level <level>', `Set log level for log messages. Current default is '${logLevelDefault}'.`);
 
+//start command
 program
 	.command('start')
 	.description(`Start time tracking with specified parameters.`)
@@ -105,6 +106,16 @@ program
 		core.start(setting);
 	});
 
+//help :)
+program.on('--help', function(){
+	console.log('');
+	console.log('');
+	console.log('  Examples:');
+	console.log('');
+	console.log('    $ peon-tt --help');
+	console.log('    $ peon-tt -wp src/**/*.* -ip **/node_modules/**,.idea/**,.grunt/** -l all');
+	console.log('');
+});
 
 //parse data
 program.parse(process.argv);
