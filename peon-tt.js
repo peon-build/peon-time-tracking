@@ -72,6 +72,7 @@ function fillSetting(env, settings) {
  */
 function processPaths(arg) {
 	let paths = arg.split(","),
+		dir = process.cwd(),
 		array = [],
 		i;
 
@@ -81,11 +82,11 @@ function processPaths(arg) {
 	}
 	//only one path
 	if (paths.length === 1) {
-		return path.resolve(__dirname, paths[0]);
+		return path.resolve(dir, paths[0]);
 	}
 	//process all
 	for (i = 0; i < paths.length; i++) {
-		array.push(path.resolve(__dirname, paths[i]));
+		array.push(path.resolve(dir, paths[i]));
 	}
 	return array;
 }
