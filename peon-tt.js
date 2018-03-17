@@ -5,7 +5,7 @@
 const path = require('path');
 const program = /** @type {local.Command}*/require('commander');
 const core = /** @type {PeonBuild.TimeTracking}*/require('./core/index')();
-const log = /** @type {PeonBuild.Log}*/require('@peon-build/peon-log')();
+const log = /** @type {PeonBuild.Log}*/require('./core/log');
 
 const globWiki = 'https://en.wikipedia.org/wiki/Glob_(programming)';
 const watchDefault = "**/*";
