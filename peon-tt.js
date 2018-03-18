@@ -2,7 +2,7 @@
 //https://www.npmjs.com/package/glob
 //https://www.npmjs.com/package/commander
 
-const log = /** @type {PeonBuild.Log}*/require('./core/log');
+const log = /** @type {PeonBuild.Log}*/require('./log');
 const program = /** @type {local.Command}*/require('commander');
 const commands = /** @type {PeonBuild.TimeTrackingCommands}*/require('./commands')();
 
