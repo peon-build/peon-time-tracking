@@ -2,10 +2,9 @@
 //https://www.npmjs.com/package/glob
 //https://www.npmjs.com/package/commander
 
-const path = require('path');
-const program = /** @type {local.Command}*/require('commander');
-const core = /** @type {PeonBuild.TimeTracking}*/require('./core/index')();
 const log = /** @type {PeonBuild.Log}*/require('./core/log');
+const program = /** @type {local.Command}*/require('commander');
+const commands = /** @type {PeonBuild.TimeTrackingCommands}*/require('./commands')();
 
 const globWiki = 'https://en.wikipedia.org/wiki/Glob_(programming)';
 const watchDefault = "**/*";
@@ -45,11 +44,11 @@ function fillSetting(env, settings) {
 		switch (name) {
 		case "watch-pattern":
 			value = env["watchPattern"] || "";
-			settings.watchPattern = processPaths(value) || settings.watchPattern;
+			settings.watchPattern = value || settings.watchPattern;
 			break;
 		case "ignore-pattern":
 			value = env["ignorePattern"] || "";
-			settings.ignorePattern = processPaths(value) || settings.ignorePattern;
+			settings.ignorePattern = value || settings.ignorePattern;
 			break;
 		case "log-level":
 			value = env["logLevel"];
@@ -65,32 +64,6 @@ function fillSetting(env, settings) {
 	return settings;
 }
 
-/**
- * Process paths
- * @param {string} arg
- * @return {Array|null|string}
- */
-function processPaths(arg) {
-	let paths = arg.split(","),
-		dir = process.cwd(),
-		array = [],
-		i;
-
-	//no provided arg
-	if (!arg) {
-		return null;
-	}
-	//only one path
-	if (paths.length === 1) {
-		return path.resolve(dir, paths[0]);
-	}
-	//process all
-	for (i = 0; i < paths.length; i++) {
-		array.push(path.resolve(dir, paths[i]));
-	}
-	return array;
-}
-
 //options
 program
 	.version('1.0.0')
@@ -103,8 +76,10 @@ program
 	.command('start')
 	.description(`Start time tracking with specified parameters.`)
 	.action((env) => {
-		let setting = fillSetting(env);
-		core.start(setting);
+		let setting = fillSetting(env),
+			directory = process.cwd();
+
+		commands.start(directory, setting);
 	});
 
 //help :)

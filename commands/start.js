@@ -1,17 +1,22 @@
-let chokidar = require('chokidar');
-let log = /** @type {PeonBuild.Log}*/require('@peon-build/peon-log')();
+const log = /** @type {PeonBuild.Log}*/require('../core/log');
+const core = /** @type {PeonBuild.TimeTracking}*/require('../core')();
+const path = require('path');
 
 /**
  * Banner
+ * @param {string} cwd
  * @param {PeonBuild.TimeTrackingSetting} setting
  */
-function banner(setting) {
+function banner(cwd, setting) {
 	//info
 	log.title('Time tracking is active and set on $1.', [
 		log.p.path(/** @type {Array}*/setting.watchPattern)
 	]);
 
 	//options
+	log.setting("current working directory", "$1", [
+		log.p.path(cwd)
+	]);
 	log.setting("log level", "$1", [log.p.text(/** @type {string}*/setting.logLevel)]);
 	log.setting("watch pattern", "$1", [log.p.text(/** @type {Array}*/setting.watchPattern)]);
 	log.setting("ignore pattern", "$1", [log.p.text(/** @type {Array}*/setting.ignorePattern)]);
@@ -21,33 +26,27 @@ function banner(setting) {
 
 /**
  * Watcher
+ * @param {string} cwd
  * @param {PeonBuild.TimeTrackingSetting} setting
- * @param {PeonBuild.TimeTrackingCommands.StartState} state
+ * @return {FSWatcher}
  */
-function watcher(setting, state) {
-	let watcher;
-
-	//init state
-	state.watchedFiles = state.watchedFiles || [];
-	state.ready = false;
+function watcher(cwd, setting) {
 	//init watcher
-	watcher = chokidar.watch(setting.watchPattern, {
-		ignored: [/(^|[\/\\])\../, setting.ignorePattern],
-		persistent: true
+	return core.watcher({
+		ignorePattern: processPaths(cwd, setting.ignorePattern),
+		watchPattern: processPaths(cwd, setting.watchPattern),
+		onAdd: onAdd,
+		onError: onError,
+		onUnlink: onUnlink,
+		onReady: onReady,
+		onChange: onChange
 	});
-
-	watcher
-		.on('error', onError.bind(watcher))
-		.on('add', onAdd.bind(watcher, state))
-		.on('unlink', onUnlink.bind(watcher, state))
-		.on('ready', onReady.bind(watcher, state))
-		.on('change', onChange.bind(watcher, state));
 }
 
 /**
  * On ready
  * @this {FSWatcher}
- * @param {PeonBuild.TimeTrackingCommands.StartState} state
+ * @param {PeonBuild.TimeTracking.Watcher.State} state
  */
 function onReady(state) {
 	let directories = directoriesCount(this.getWatched()),
@@ -58,22 +57,19 @@ function onReady(state) {
 		log.p.number(directories.toString())
 	]);
 	log.log('Time tracking is ready for changes!');
-
-	state.ready = true;
 }
 
 /**
  * On add
  * @this {FSWatcher}
- * @param {PeonBuild.TimeTrackingCommands.StartState} state
+ * @param {PeonBuild.TimeTracking.Watcher.State} state
  * @param {string} path
  */
 function onAdd(state, path) {
-	//add file
-	state.watchedFiles.push(path);
 	//report
-	log.filename("Adding file $1", [
-		log.p.path(path)
+	log.filename("Adding file $1. Now totally watching $2 files.", [
+		log.p.path(path),
+		log.p.number(state.watchedFiles.length.toString())
 	]);
 
 	//TODO: Save into log
@@ -82,7 +78,7 @@ function onAdd(state, path) {
 /**
  * On change
  * @this {FSWatcher}
- * @param {PeonBuild.TimeTrackingCommands.StartState} state
+ * @param {PeonBuild.TimeTracking.Watcher.State} state
  * @param {string} path
  * @param {Stats|null} stats
  */
@@ -99,19 +95,14 @@ function onChange(state, path, stats) {
 /**
  * On unlink
  * @this {FSWatcher}
- * @param {PeonBuild.TimeTrackingCommands.StartState} state
+ * @param {PeonBuild.TimeTracking.Watcher.State} state
  * @param {string} path
  */
 function onUnlink(state, path) {
-	let index = state.watchedFiles.indexOf(path);
-
-	//remove file
-	if (index >= 0) {
-		state.watchedFiles.splice(index, 1);
-	}
 	//report
-	log.filename("Removing file $1", [
-		log.p.path(path)
+	log.filename("Removing file $1. Now totally watching $2 files.", [
+		log.p.path(path),
+		log.p.number(state.watchedFiles.length.toString())
 	]);
 
 	//TODO: Save into log
@@ -154,17 +145,43 @@ function directoriesCount(watchedPaths) {
 }
 
 /**
+ * Process paths
+ * @param {string} dir
+ * @param {string} arg
+ * @return {Array|null|string}
+ */
+function processPaths(dir, arg) {
+	let paths = arg.split(","),
+		array = [],
+		i;
+
+	//no provided arg
+	if (!arg) {
+		return "";
+	}
+	//only one path
+	if (paths.length === 1) {
+		return path.resolve(dir, paths[0]).replace(/\\/g, "/");
+	}
+	//process all
+	for (i = 0; i < paths.length; i++) {
+		array.push(path.resolve(dir, paths[i]).replace(/\\/g, "/"));
+	}
+	return array;
+}
+
+
+/**
  * Command start
+ * @param {string} cwd
  * @param {PeonBuild.TimeTrackingSetting} setting
  */
-function commandStart(setting) {
-	let state = /** @type {PeonBuild.TimeTrackingCommands.StartState}*/{};
-
+function commandStart(cwd, setting) {
 	//set logger level
 	log.level(setting.logLevel);
 	//run and prepare
-	banner(setting);
-	watcher(setting, state);
+	banner(cwd, setting);
+	watcher(cwd, setting);
 }
 //export
 module.exports = commandStart;

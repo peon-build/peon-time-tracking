@@ -1,17 +1,12 @@
-let commandStart = require('./commands/start');
+let watcher = require('./tools/watcher');
 
 
 function peonTimeTracking() {
 	//interface
 	return {
 
-		/**
-		 * Start
-		 * @param {PeonBuild.TimeTrackingSetting} setting
-		 */
-		start(setting) {
-			commandStart(setting);
-		}
+		//watcher
+		watcher: watcher
 
 	}
 }
