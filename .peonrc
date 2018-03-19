@@ -1,0 +1,24 @@
+/**@type {PeonBuild.PeonRc.Config}*/
+module.exports = {
+
+	//output
+	output: {
+
+	},
+	//vendors
+	vendors: {
+
+	},
+	//src
+	src: {
+
+	},
+	//tests
+	tests: {
+		runner: "karma",
+		framework: "jasmine"
+	},
+
+	//build steps
+	steps: []
+};
