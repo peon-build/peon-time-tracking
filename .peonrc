@@ -2,17 +2,22 @@
 module.exports = {
 
 	//output
-	output: {
-
-	},
+	output: "./build/",
+	//package
+	package: [
+		"./*.md",
+		"./package.json",
+		"./peon-tt.cmd"
+	],
 	//vendors
-	vendors: {
-
-	},
+	vendors: [],
 	//src
-	src: {
-
-	},
+	src: null,
+	//entry
+	entry: [
+		"index.js",
+		"peon-tt.js",
+	],
 	//tests
 	tests: {
 		runner: "karma",

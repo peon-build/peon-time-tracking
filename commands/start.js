@@ -1,5 +1,5 @@
 const log = /** @type {PeonBuild.Log}*/require('../log');
-const core = /** @type {PeonBuild.TimeTracking}*/require('../core')();
+const core = /** @type {PeonBuild.TimeTracking}*/require('../index')();
 const path = require('path');
 
 /**
