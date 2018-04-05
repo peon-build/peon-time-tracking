@@ -24,6 +24,9 @@ module.exports = {
 		framework: "jasmine"
 	},
 
+	//dep
+	dependencies: [],
+
 	//build steps
 	steps: []
 };
